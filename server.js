@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-app.use("/dsaTracker", dsaTrackerRoute);
+app.use("/", dsaTrackerRoute);
 
 // app.use("/auth", authRoute);
 
