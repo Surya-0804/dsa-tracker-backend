@@ -8,4 +8,4 @@ const problemSchema = new mongoose.Schema({
 });
 
 
-export default mongoose.model('problemSchema', problemSchema);
+export default mongoose.model('dsatopics', problemSchema);
