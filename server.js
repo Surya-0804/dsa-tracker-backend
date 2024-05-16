@@ -9,7 +9,7 @@ import bodyParser from "body-parser";
 import connectDB from "./config/db.js";
 
 // import authRoute from "./routes/authRoute.js";
-// import problemRoute from "./routes/problemRoute.js";
+import dsaTrackerRoute from "./routes/dsaTrackerRoute.js";
 
 import insertData from "./data/addData.js";
 
@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// app.use("/dsaTracker", problemRoute);
+app.use("/dsaTracker", dsaTrackerRoute);
 
 // app.use("/auth", authRoute);
 
