@@ -11,7 +11,7 @@ import connectDB from "./config/db.js";
 // import authRoute from "./routes/authRoute.js";
 import dsaTrackerRoute from "./routes/dsaTrackerRoute.js";
 
-import insertData from "./data/addData.js";
+// import insertData from "./data/addData.js";
 
 const app = express();
 
