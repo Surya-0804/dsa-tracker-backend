@@ -1,18 +1,26 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
+const userSchema = new mongoose.Schema({
+    type: {
+        type: String
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    mobileNo: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String
+    },
 
-const productSchema = new mongoose.Schema({
-    userid: String,
-    username: String,
-    producerid: String,
-    producername: String,
-    name: String,
-    price: Number,
-    imgUrl: String,
-    quantity: Number,
-    category: String,
-    date: String
 });
 
-
-export default mongoose.model('wishlists', productSchema);
+export default mongoose.model('users', userSchema);

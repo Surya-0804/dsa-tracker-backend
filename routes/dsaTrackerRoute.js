@@ -1,5 +1,5 @@
 import express from 'express';
-import { problemFetchingController } from '../controllers/problemController.js';
+import { getQuestionsByTopicsController } from '../controllers/problemController.js';
 
 
 //router object
@@ -7,7 +7,7 @@ const router = express.Router();
 
 //routing 
 
-router.get("/home", problemFetchingController);
+router.get("/home", getQuestionsByTopicsController);
 
 
 export default router;
