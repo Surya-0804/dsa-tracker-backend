@@ -7,7 +7,7 @@ const router = express.Router();
 
 //routing 
 
-router.get("/home", getQuestionsByTopicsController);
+router.post("/home", getQuestionsByTopicsController);
 
 
 export default router;
