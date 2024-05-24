@@ -31,6 +31,24 @@ export const getQuestionsByTopicsController = async (req, res) => {
     }
 };
 
+
+export const getAllProblemsController = async (req, res) => {
+    try {
+        const result = await dsaTracker.find({});
+
+        return res.status(200).send({
+            result,
+            success: false,
+            message: "Why this was getting wrong"
+        })
+
+    } catch (err) {
+        console.error("Error fetching questions by topics:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
 export const userdsaProgress = async (req, res) => {
     try {
         const userStatus = userStatus.find({ userid: userid });
