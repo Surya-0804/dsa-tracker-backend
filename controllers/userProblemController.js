@@ -2,7 +2,7 @@ import userSchema from "../../models/auth/userSchema.js";
 import postSchema from "../../models/vishnu/postSchema.js";
 import userPostsSchema from "../../models/vishnu/userPostsSchema.js";
 
-export const myPostsController = async (req, res) => {
+export const bookmarkProblemController = async (req, res) => {
     try {
         const userid = req.query.userid;
         const myPosts = await postSchema.find({ userid: userid });

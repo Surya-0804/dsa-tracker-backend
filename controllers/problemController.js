@@ -14,6 +14,7 @@ export const getQuestionsByTopicsController = async (req, res) => {
                 _id: question._id,
                 Topic: question.Topic,
                 Problem: question.Problem,
+                Difficulty: question.Difficulty,
                 Done: question.Done,
                 URL: question.URL,
             }));
