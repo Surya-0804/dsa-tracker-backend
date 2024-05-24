@@ -10,4 +10,41 @@ const router = express.Router();
 router.post("/home", getQuestionsByTopicsController);
 
 router.get("/home", getAllProblemsController);
+
+router.get('/', (req, res) => {
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to DSA TRACKER</title>
+            <style>
+                body {
+                    display: flex;
+                    flex-direction:column;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    font-family: Arial, sans-serif;
+                    background-color: #f0f0f0;
+                }
+                h1 {
+                    color: #333;
+                }
+                h2{
+                    color: #333;
+                    margin-top:-1vh;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Welcome to DSA TRACKER</h1>
+            <h2>Designed by Skill 2040 Developers</h2>
+        </body>
+        </html>
+    `;
+    res.send(htmlContent);
+});
 export default router;
