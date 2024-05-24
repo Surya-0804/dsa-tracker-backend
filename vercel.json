@@ -1,14 +1,14 @@
 {
+    "builds": [
+        {
+            "source": "./server.js",
+            "use": "@vercel/node"
+        }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",
-            "destination": "/",
-            "methods": [
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE"
-            ]
+            "destination": "/"
         }
     ]
 }
