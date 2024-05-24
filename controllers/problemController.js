@@ -34,21 +34,29 @@ export const getQuestionsByTopicsController = async (req, res) => {
 
 export const getAllProblemsController = async (req, res) => {
     try {
-        const result = await dsaTracker.find({});
+        const results = await dsaTracker.find({});
+
+        const groupedQuestions = {};
+
+        // Iterate through each document and organize by topic
+        results.forEach(({ Topic, Problem, Difficulty, URL }) => {
+            if (!groupedQuestions[Topic]) {
+                groupedQuestions[Topic] = [];
+            }
+            groupedQuestions[Topic].push({ Problem, Difficulty, URL });
+        });
 
         return res.status(200).send({
-            result,
-            success: false,
-            message: "Why this was getting wrong"
-        })
+            success: true,
+            data: groupedQuestions,
+            message: "Questions grouped by topics"
+        });
 
     } catch (err) {
         console.error("Error fetching questions by topics:", err);
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
-
 export const userdsaProgress = async (req, res) => {
     try {
         const userStatus = userStatus.find({ userid: userid });
