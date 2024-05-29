@@ -1,13 +1,11 @@
 import express from 'express';
-import { getQuestionsByTopicsController, getAllProblemsController } from '../controllers/problemController.js';
+import { getAllProblemsController } from '../controllers/problemController.js';
 
 
 //router object
 const router = express.Router();
 
 //routing 
-
-router.post("/home", getQuestionsByTopicsController);
 
 router.get("/home", getAllProblemsController);
 
