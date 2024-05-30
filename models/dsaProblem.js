@@ -15,7 +15,8 @@ const dsaproblem = new mongoose.Schema({
         default: {}
     },
     notes: {
-        type: [String],
+        type: Map,
+        of: [String],
         default: {}
     },
     solutions: {
@@ -31,4 +32,4 @@ const dsaproblem = new mongoose.Schema({
         default: []
     }
 });
-export default mongoose.model('dsaproblem', dsaproblem);
+export default mongoose.model('userProblemSch', dsaproblem);

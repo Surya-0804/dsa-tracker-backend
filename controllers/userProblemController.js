@@ -1,89 +1,115 @@
 import userSchema from "../../models/auth/userSchema.js";
 import postSchema from "../../models/vishnu/postSchema.js";
-import userPostsSchema from "../../models/vishnu/userPostsSchema.js";
+import userProblemSchema from "../../models/vishnu/userPostsSchema.js";
 
 export const bookmarkProblemController = async (req, res) => {
     try {
-        const userid = req.query.userid;
-        const myPosts = await postSchema.find({ userid: userid });
-        const u = await userSchema.findOne({ _id: userid });
+        const { userid, problemid } = req.query;
 
-        const allTweets = [];
-        for (const post of myPosts) {
-            const user = await userSchema.findOne({ _id: post.userid });
-            const obj = {
-                post,
-                user
-            };
-            allTweets.push(obj);
+        const problem = await userProblemSchema.findById(problemid);
+        if (!problem) {
+            return res.status(404).send({
+                success: false,
+                message: "Problem not found"
+            });
         }
-        const header = "My Posts";
-        res.render("vishnu/myPosts", { allTweets, u, header });
 
-    }
-    catch (err) {
+        problem.bookmarks.push(userid);
+        await problem.save();
+
+        return res.status(200).send({
+            success: true,
+            message: "Problem bookmarked successfully"
+        });
+    } catch (err) {
         return res.status(500).send({
             success: false,
-            message: "Why this was getting wrong"
-        })
+            message: "An error occurred while bookmarking the problem"
+        });
+    }
+};
+export const myFavController = async (req, res) => {
+    try {
+        const { userid, problemid } = req.query;
+
+        const problem = await userProblemSchema.findById(problemid);
+        if (!problem) {
+            return res.status(404).send({
+                success: false,
+                message: "Problem not found"
+            });
+        }
+
+        problem.favourites.push(userid);
+        await problem.save();
+
+        return res.status(200).send({
+            success: true,
+            message: "Problem bookmarked successfully"
+        });
+    } catch (err) {
+        return res.status(500).send({
+            success: false,
+            message: "An error occurred while bookmarking the problem"
+        });
     }
 };
 
-export const myLikedTweetsController = async (req, res) => {
+export const solutionsController = async (req, res) => {
     try {
-        const userid = req.query.userid;
-        const bookmakedPosts = await userPostsSchema.find({ userid: userid, role: 0 });
-        const u = await userSchema.findOne({ _id: userid });
+        const { userid, problemid } = req.query;
 
-        const allTweets = [];
-        for (const p of bookmakedPosts) {
-            const post = await postSchema.findOne({ _id: p.postid });
-            const user = await userSchema.findOne({ _id: post.userid });
-            const obj = {
-                post,
-                user
-            };
-            allTweets.push(obj);
+        const problem = await userProblemSchema.findById(problemid);
+        if (!problem) {
+            return res.status(404).send({
+                success: false,
+                message: "Problem not found"
+            });
         }
-        const header = "Liked Tweets";
 
-        res.render("vishnu/myPosts", { allTweets, u, header });
+        problem.solutions.push(userid);
+        await problem.save();
 
-    }
-    catch (err) {
+        return res.status(200).send({
+            success: true,
+            message: "Problem bookmarked successfully"
+        });
+    } catch (err) {
         return res.status(500).send({
             success: false,
-            message: "Why this was getting wrong"
-        })
+            message: "An error occurred while bookmarking the problem"
+        });
     }
 };
 
-export const myBoomarkedTweetsController = async (req, res) => {
+export const notesController = async (req, res) => {
     try {
-        const userid = req.query.userid;
-        const bookmakedPosts = await userPostsSchema.find({ userid: userid, role: 1 });
-        const u = await userSchema.findOne({ _id: userid });
+        const { userid, problemid, note } = req.query;
 
-        const allTweets = [];
-        for (const p of bookmakedPosts) {
-            const post = await postSchema.findOne({ _id: p.postid });
-            const user = await userSchema.findOne({ _id: post.userid });
-            const obj = {
-                post,
-                user
-            };
-            allTweets.push(obj);
+        const problem = await userProblemSchema.findById(problemid);
+        if (!problem) {
+            return res.status(404).send({
+                success: false,
+                message: "Problem not found"
+            });
         }
-        console.log(allTweets);
-        const header = "Bookmarked Tweets";
 
-        res.render("vishnu/myPosts", { allTweets, u, header });
+        if (!problem.notes.has(userid)) {
+            problem.notes.set(userid, []);
+        }
 
-    }
-    catch (err) {
+        problem.notes.get(userid).push(note);
+        await problem.save();
+
+        return res.status(200).send({
+            success: true,
+            message: "Note added successfully"
+        });
+    } catch (err) {
         return res.status(500).send({
             success: false,
-            message: "Why this was getting wrong"
-        })
+            message: "An error occurred while adding the note",
+            error: err.message
+        });
     }
 };
