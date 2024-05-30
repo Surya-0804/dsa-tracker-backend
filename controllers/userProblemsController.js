@@ -1,6 +1,5 @@
-import userSchema from "../../models/auth/userSchema.js";
-import postSchema from "../../models/vishnu/postSchema.js";
-import userProblemsSchema from "../../models/vishnu/userPostsSchema.js";
+
+import userProblemsSchema from "../../models/userProblems.js";
 
 export const bookmarkProblemController = async (req, res) => {
     try {
