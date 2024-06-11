@@ -12,6 +12,8 @@ export const loginController = async (req, res) => {
             });
         }
         try {
+            console.log(email);
+            console.log(password);
             const data = await userModel.findOne({ email: email });
             if (!data) {
                 return res.json({
@@ -24,6 +26,7 @@ export const loginController = async (req, res) => {
                         { _id: data._id, role: "user" },
                         process.env.JWT_SECRET
                     );
+                    console.log(token)
                     const encode = jwt.verify(token, process.env.JWT_SECRET);
                     return res.json({
                         token: token,

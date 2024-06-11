@@ -12,15 +12,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    mobileNo: {
-        type: String,
-        required: true
-    },
-    address: {
-        type: String
-    },
-
+    }
 });
 
 export default mongoose.model('users', userSchema);
