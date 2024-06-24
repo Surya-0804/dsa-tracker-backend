@@ -7,7 +7,6 @@ import path from 'path';
 import bodyParser from "body-parser";
 
 import connectDB from "./config/db.js";
-
 // import authRoute from "./routes/authRoute.js";
 import dsaTrackerRoute from "./routes/dsaTrackerRoute.js";
 import authRoute from './routes/authRoute.js';
@@ -36,5 +35,5 @@ app.use("/auth", authRoute);
 // app.use("/auth", authRoute);
 
 app.listen(process.env.PORT, () => {
-    console.log(`BE started at port ${process.env.PORT}`);
+  console.log(`BE started at port ${process.env.PORT}`);
 })

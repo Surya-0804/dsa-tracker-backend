@@ -1,11 +1,13 @@
-import { hashPassword, comparePassword } from "../helpers/authHelper.js";
+import { hashPassword, comparePassword, validateEmail, toTitleCase } from "../helpers/authHelper.js";
 import path from 'path';
-import userModel from "../models/auth/userSchema.js";
-import { addNewUserController } from "./userProgressController.js"
+import userModel from "../models/users.js";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const loginController = async (req, res) => {
     try {
         let { email, password } = req.body;
+        console.log(email);
         if (!email || !password) {
             return res.json({
                 error: "Fields must not be empty",
@@ -53,21 +55,20 @@ export const loginController = async (req, res) => {
 }
 
 export const registerController = async (req, res) => {
-    let { name, email, password, cPassword } = req.body;
+    let { name, email, password } = req.body;
     let error = {};
     try {
-        if (!name || !email || !password || !cPassword) {
+        if (!name || !email || !password) {
             error = {
                 ...error,
                 name: "Filed must not be empty",
                 email: "Filed must not be empty",
-                password: "Filed must not be empty",
-                cPassword: "Filed must not be empty",
+                password: "Filed must not be empty"
             };
             return res.json({ error });
         }
         if (name.length < 3 || name.length > 25) {
-            error = { ...error, name: "Name must be 3-25 charecter" };
+            error = { ...error, name: "Name must be 3-25 characters" };
             return res.json({ error });
         } else {
             if (validateEmail(email)) {
@@ -96,8 +97,7 @@ export const registerController = async (req, res) => {
                             let newUser = new userModel({
                                 name,
                                 email,
-                                password,
-                                userRole: 1,
+                                password
                             });
                             newUser
                                 .save()
