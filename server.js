@@ -7,40 +7,48 @@ import path from 'path';
 import bodyParser from "body-parser";
 
 import connectDB from "./config/db.js";
-// import authRoute from "./routes/authRoute.js";
 import dsaTrackerRoute from "./routes/dsaTrackerRoute.js";
 import authRoute from './routes/authRoute.js';
+import corsHandler from "./allowCors.js";
 
-// import insertData from "./data/addData.js"
+// Initialize express app
 const app = express();
 
+// Load environment variables
+dotenv.config();
+
+// Connect to the database
 connectDB();
-// insertData();
 
-dotenv.config()
+// Middleware for logging requests
+app.use(morgan('dev'));
 
+// CORS setup
 const corsOptions = {
-  origin: `${process.env.CLIENT_URL}`,
+  origin: [process.env.CLIENT_URL, 'http://localhost:3002'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
 
-// Parses JSON data in incoming requests.
+// Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
-// Logs HTTP requests in a developer-friendly format.
 app.use(express.urlencoded({ extended: true }));
-
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
+// Use CORS handler middleware if you need to set custom headers
+
+
+// Define your routes
 app.use("/", dsaTrackerRoute);
-
 app.use("/auth", authRoute);
-// app.use("/auth", authRoute);
 
-app.listen(process.env.PORT, () => {
-  console.log(`BE started at port ${process.env.PORT}`);
-})
+// Start the server
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+  console.log(`Backend server started at port ${PORT}`.green);
+});
