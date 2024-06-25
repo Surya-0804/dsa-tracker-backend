@@ -23,5 +23,6 @@
     "morgan": "^1.10.0",
     "nodemon": "^3.1.0",
     "path": "^0.12.7"
-  }
+  },
+   "proxy": "https://dsa-tracker-backend.vercel.app"
 }

@@ -19,7 +19,14 @@ connectDB();
 
 dotenv.config()
 
-app.use(cors());
+const corsOptions = {
+  origin: `${process.env.CLIENT_URL}`,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+
 // Parses JSON data in incoming requests.
 app.use(express.json());
 // Logs HTTP requests in a developer-friendly format.
