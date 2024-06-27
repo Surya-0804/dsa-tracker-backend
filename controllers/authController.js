@@ -36,16 +36,17 @@ export const loginController = async (req, res) => {
 
 // Register Controller
 export const registerController = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, phoneNo } = req.body;
     let error = {};
 
     try {
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !phoneno) {
             error = {
                 ...error,
                 name: "Field must not be empty",
                 email: "Field must not be empty",
                 password: "Field must not be empty"
+                phoneno: "Field must not be empty"
             };
             return res.status(400).json({ error });
         }
@@ -65,6 +66,10 @@ export const registerController = async (req, res) => {
             return res.status(400).json({ error });
         }
 
+        if (phoneNo.length < 10 || password.length > 10) {
+            error = { ...error, password: "PhoneNo must be 10 length" };
+            return res.status(400).json({ error });
+        }
         const existingUser = await userModel.findOne({ email: email });
         if (existingUser) {
             error = { ...error, email: "Email already exists" };
@@ -72,7 +77,7 @@ export const registerController = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new userModel({ name: toTitleCase(name), email, password: hashedPassword });
+        const newUser = new userModel({ name: toTitleCase(name), email, password: hashedPassword, phoneNo });
         await newUser.save();
 
         return res.json({ success: "Account created successfully. Please login" });
