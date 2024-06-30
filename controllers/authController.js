@@ -9,15 +9,16 @@ export const loginController = async (req, res) => {
         const { email, password, isGoogleUser } = req.body;
         console.log(email)
         console.log(password)
-        if (!email || !password || !isGoogleUser) {
+        console.log(isGoogleUser)
+        if (!email || !password) {
             return res.status(400).json({ error: "Fields must not be empty" });
         }
-
+        let user;
         if (isGoogleUser) {
-            const user = await userModel.findOne({ googleUid: password, isGoogleUser: true });
+            user = await userModel.findOne({ googleUid: password, isGoogleUser: true });
         }
         else {
-            const user = await userModel.findOne({ email: email, isGoogleUser: false });
+            user = await userModel.findOne({ email: email, isGoogleUser: false });
         }
 
         if (!user) {
@@ -31,7 +32,7 @@ export const loginController = async (req, res) => {
         console.log(isMatch)
         const token = jwt.sign({ _id: user._id, role: "user" }, process.env.JWT_SECRET, { expiresIn: '5h' });
         console.log(token)
-        return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, photoUrl: photoUrl } });
+        return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, photoUrl: user.photoUrl } });
 
     } catch (err) {
         console.error(err);
