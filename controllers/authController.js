@@ -66,10 +66,6 @@ export const registerController = async (req, res) => {
             return res.status(400).json({ error });
         }
 
-        if (phoneNo.length < 10 || password.length > 10) {
-            error = { ...error, password: "PhoneNo must be 10 length" };
-            return res.status(400).json({ error });
-        }
         const existingUser = await userModel.findOne({ email: email });
         if (existingUser) {
             error = { ...error, email: "Email already exists" };
