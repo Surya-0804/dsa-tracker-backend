@@ -36,11 +36,11 @@ export const loginController = async (req, res) => {
 
 // Register Controller
 export const registerController = async (req, res) => {
-    const { name, email, password, phoneNo } = req.body;
+    const { name, email, password, phoneNo, isGoogleUser, photoUrl } = req.body;
     let error = {};
 
     try {
-        if (!name || !email || !password || !phoneNo) {
+        if (!name || !email || !password) {
             error = {
                 ...error,
                 name: "Field must not be empty",
@@ -61,7 +61,7 @@ export const registerController = async (req, res) => {
             return res.status(400).json({ error });
         }
 
-        if (password.length < 8 || password.length > 255) {
+        if (password.length < 8) {
             error = { ...error, password: "Password must be 8-255 characters" };
             return res.status(400).json({ error });
         }
@@ -73,8 +73,17 @@ export const registerController = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new userModel({ name: toTitleCase(name), email, password: hashedPassword, phoneNo });
-        await newUser.save();
+
+        if (isGoogleUser) {
+            const newUser = new userModel({ name: toTitleCase(name), email, password: hashedPassword, photoUrl, googleUid: uid, isGoogleUser: true });
+            await newUser.save();
+        }
+        else {
+            const newUser = new userModel({ name: toTitleCase(name), email, password: hashedPassword, phoneNo, isGoogleUser: false });
+            await newUser.save();
+        }
+
+
 
         return res.json({ success: "Account created successfully. Please login" });
 

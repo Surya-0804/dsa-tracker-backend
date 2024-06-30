@@ -16,6 +16,15 @@ const userSchema = new mongoose.Schema({
     },
     phoneNo: {
         type: String
+    },
+    isGoogleUser: {
+        type: Boolean
+    },
+    googleUid: {
+        type: String,
+    },
+    photoUrl: {
+        type: String,
     }
 });
 
