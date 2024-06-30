@@ -6,14 +6,20 @@ import jwt from 'jsonwebtoken';
 // Login Controller
 export const loginController = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, isGoogleUser } = req.body;
         console.log(email)
         console.log(password)
         if (!email || !password) {
             return res.status(400).json({ error: "Fields must not be empty" });
         }
 
-        const user = await userModel.findOne({ email: email });
+        if (isGoogleUser) {
+            const user = await userModel.findOne({ googleUid: password, isGoogleUser: true });
+        }
+        else {
+            const user = await userModel.findOne({ email: email, isGoogleUser: false });
+        }
+
         if (!user) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
@@ -23,10 +29,9 @@ export const loginController = async (req, res) => {
             return res.status(401).json({ error: "Invalid email or password" });
         }
         console.log(isMatch)
-        const token = jwt.sign({ _id: user._id, role: "user" }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ _id: user._id, role: "user" }, process.env.JWT_SECRET, { expiresIn: '5h' });
         console.log(token)
-        console.log("authentication completed successfully")
-        return res.json({ token, user: { _id: user._id, name: user.name, email: user.email } });
+        return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, photoUrl: photoUrl } });
 
     } catch (err) {
         console.error(err);
