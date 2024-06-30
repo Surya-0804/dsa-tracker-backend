@@ -5,11 +5,11 @@ import colors from "colors";
 import dotenv from "dotenv";
 import path from 'path';
 import bodyParser from "body-parser";
-
 import connectDB from "./config/db.js";
 import dsaTrackerRoute from "./routes/dsaTrackerRoute.js";
 import authRoute from './routes/authRoute.js';
 import corsHandler from "./allowCors.js";
+import problemsProgressRoute from './routes/problemsProgressRoute.js'
 
 // Initialize express app
 const app = express();
@@ -46,6 +46,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 // Define your routes
 app.use("/", dsaTrackerRoute);
 app.use("/auth", authRoute);
+app.use("/problemProgress", problemsProgressRoute);
 
 // Start the server
 const PORT = process.env.PORT

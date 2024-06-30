@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const dsaproblem = new mongoose.Schema({
+const problemsProgress = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
@@ -12,7 +12,7 @@ const dsaproblem = new mongoose.Schema({
     },
     favourites: {
         type: [String],
-        default: {}
+        default: []
     },
     notes: {
         type: Map,
@@ -20,8 +20,9 @@ const dsaproblem = new mongoose.Schema({
         default: {}
     },
     solutions: {
-        type: [String],
-        default: []
+        type: Map,
+        of: [String],
+        default: {}
     },
     problemSolved: {
         type: [String],
@@ -32,4 +33,4 @@ const dsaproblem = new mongoose.Schema({
         default: []
     }
 });
-export default mongoose.model('userProblems', dsaproblem);
+export default mongoose.model('problemsProgress', problemsProgress);

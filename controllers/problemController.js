@@ -30,7 +30,7 @@ export const getAllProblemsController = async (req, res) => {
 
 export const bookmarkController = async (req, res) => {
     try {
-
+        
     }
     catch (err) {
         console.error("Error :", err);
