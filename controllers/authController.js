@@ -9,7 +9,7 @@ export const loginController = async (req, res) => {
         const { email, password, isGoogleUser } = req.body;
         console.log(email)
         console.log(password)
-        if (!email || !password) {
+        if (!email || !password || !isGoogleUser) {
             return res.status(400).json({ error: "Fields must not be empty" });
         }
 
