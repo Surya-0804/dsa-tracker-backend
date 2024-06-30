@@ -25,7 +25,7 @@ app.use(morgan('dev'));
 
 // CORS setup
 const corsOptions = {
-  origin: [process.env.CLIENT_URL, 'http://localhost:3001', 'http://localhost:3002', 'https://dsa-tracker-website.vercel.app'],
+  origin: [process.env.CLIENT_URL, 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3000', 'https://dsa-tracker-website.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

@@ -40,13 +40,13 @@ export const registerController = async (req, res) => {
     let error = {};
 
     try {
-        if (!name || !email || !password || !phoneno) {
+        if (!name || !email || !password || !phoneNo) {
             error = {
                 ...error,
                 name: "Field must not be empty",
                 email: "Field must not be empty",
                 password: "Field must not be empty"
-                phoneno: "Field must not be empty"
+                phoneNo: "Field must not be empty"
             };
             return res.status(400).json({ error });
         }
