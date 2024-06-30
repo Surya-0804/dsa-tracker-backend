@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/home", authenticateToken, getAllProblemsController);
 
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
     const htmlContent = `
         <!DOCTYPE html>
         <html lang="en">
