@@ -1,13 +1,12 @@
 import express from 'express';
 import { getAllProblemsController } from '../controllers/problemController.js';
-
-
+import authenticateToken from '../middlewares/authenticateToken.js';
 //router object
 const router = express.Router();
 
 //routing 
 
-router.get("/home", getAllProblemsController);
+router.get("/home", authenticateToken, getAllProblemsController);
 
 router.get('/', (req, res) => {
     const htmlContent = `

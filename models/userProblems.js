@@ -32,4 +32,4 @@ const dsaproblem = new mongoose.Schema({
         default: []
     }
 });
-export default mongoose.model('userProblemSch', dsaproblem);
+export default mongoose.model('userProblems', dsaproblem);
