@@ -9,11 +9,11 @@ export const getAllProblemsController = async (req, res) => {
         const groupedQuestions = {};
 
         // Iterate through each document and organize by topic
-        results.forEach(({ Topic, Problem, Difficulty, URL }) => {
+        results.forEach(({ _id, Topic, Problem, Difficulty, URL }) => {
             if (!groupedQuestions[Topic]) {
                 groupedQuestions[Topic] = [];
             }
-            groupedQuestions[Topic].push({ Problem, Difficulty, URL });
+            groupedQuestions[Topic].push({ _id, Problem, Difficulty, URL });
         });
 
         return res.status(200).send({
@@ -30,7 +30,7 @@ export const getAllProblemsController = async (req, res) => {
 
 export const bookmarkController = async (req, res) => {
     try {
-        
+
     }
     catch (err) {
         console.error("Error :", err);

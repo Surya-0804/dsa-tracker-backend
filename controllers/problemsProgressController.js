@@ -3,6 +3,7 @@ import problemsProgress from "../models/problemsProgress.js";
 export const bookmarkController = async (req, res) => {
     try {
         const { userId, problemId } = req.body;
+        console.log(problemId)
 
         let progress = await problemsProgress.findOne({ userId });
 

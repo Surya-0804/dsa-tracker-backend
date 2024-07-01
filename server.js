@@ -42,7 +42,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Use CORS handler middleware if you need to set custom headers
 
-
 // Define your routes
 app.use("/", dsaTrackerRoute);
 app.use("/auth", authRoute);

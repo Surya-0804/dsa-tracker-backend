@@ -24,11 +24,11 @@ const problemsProgress = new mongoose.Schema({
         of: [String],
         default: {}
     },
-    problemSolved: {
+    solvedProblems: {
         type: [String],
         default: []
     },
-    problemForRevision: {
+    revisionProblems: {
         type: [String],
         default: []
     }
