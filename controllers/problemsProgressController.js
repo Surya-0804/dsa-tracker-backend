@@ -40,10 +40,10 @@ export const bookmarkController = async (req, res) => {
 };
 export const favController = async (req, res) => {
     try {
-        const { userid, problemid } = req.body;
+        const { userId, problemId } = req.body;
 
         // Find the problem by its ID
-        const problem = await problemsProgress.findOne({ problemid });
+        const problem = await problemsProgress.findOne({ problemId });
 
         if (!problem) {
             // If problem not found, return 404
@@ -54,9 +54,9 @@ export const favController = async (req, res) => {
         }
 
         // Check if the user already exists in favorites to prevent duplication
-        if (!problem.favourites.includes(userid)) {
+        if (!problem.favourites.includes(userId)) {
             // Add user to favorites array
-            problem.favourites.push(userid);
+            problem.favourites.push(userId);
         } else {
             // If user already in favorites, return success message
             return res.status(200).send({
@@ -84,10 +84,10 @@ export const favController = async (req, res) => {
 
 export const notesController = async (req, res) => {
     try {
-        const { userid, problemid, note } = req.body;
+        const { userId, problemId, note } = req.body;
 
         // Find the problem by its ID
-        const problem = await problemsProgress.findOne({ problemid });
+        const problem = await problemsProgress.findOne({ problemId });
 
         if (!problem) {
             // If problem not found, return 404
@@ -98,8 +98,8 @@ export const notesController = async (req, res) => {
         }
 
         // Initialize an empty array if the user's notes map doesn't exist
-        if (!problem.notes.has(userid)) {
-            problem.notes.set(userid, []);
+        if (!problem.notes.has(userId)) {
+            problem.notes.set(userId, []);
         }
 
         // Add the note to the user's notes array for this problem
@@ -122,88 +122,65 @@ export const notesController = async (req, res) => {
     }
 };
 
-export const solvedProblemsController = async (req, res) => {
+export const problemStatusController = async (req, res) => {
     try {
-        const { userid, problemid } = req.body;
+        const { userId, problemId, status } = req.body;
 
-        // Find the problem by its ID
-        const problem = await problemsProgress.findOne({ problemid });
+        // Define the arrays to check and update
+        const statusArrays = {
+            solved: 'solvedProblems',
+            unsolved: 'unsolvedProblems',
+            revision: 'revisionProblems'
+        };
+
+        // Validate status
+        if (!statusArrays[status]) {
+            return res.status(400).send({
+                success: false,
+                message: "Invalid status provided"
+            });
+        }
+
+        // Find the problem by its userId
+        let problem = await problemsProgress.findOne({ userId });
 
         if (!problem) {
-            // If problem not found, return 404
-            return res.status(404).send({
-                success: false,
-                message: "Problem not found"
+            // If user progress not found, create a new document
+            problem = new problemsProgress({ userId });
+        }
+
+        // Check if the problemId is already in the specified status array
+        if (problem[statusArrays[status]].includes(problemId)) {
+            return res.status(200).send({
+                success: true,
+                message: `Problem is already marked as ${status}`
             });
         }
 
-        // Check if the user already exists in problemSolved to prevent duplication
-        if (!problem.solvedProblems.includes(userid)) {
-            // Add user to problemSolved array
-            problem.solvedProblems.push(userid);
-        } else {
-            // If user already in problemSolved, return success message
-            return res.status(200).send({
-                success: true,
-                message: "Problem is already marked as solved"
-            });
-        }
+        // Remove the problemId from all arrays
+        Object.keys(statusArrays).forEach(key => {
+            const array = problem[statusArrays[key]];
+            const index = array.indexOf(problemId);
+            if (index > -1) {
+                array.splice(index, 1);
+            }
+        });
+
+        // Add the problemId to the appropriate array based on status
+        problem[statusArrays[status]].push(problemId);
 
         // Save the updated problem document
         await problem.save();
 
         return res.status(200).send({
             success: true,
-            message: "Problem marked as solved successfully"
+            message: `Problem marked as ${status} successfully`
         });
     } catch (err) {
-        console.error("Error while marking problem as solved:", err);
+        console.error("Error while marking problem status:", err);
         return res.status(500).send({
             success: false,
-            message: "An error occurred while marking the problem as solved"
-        });
-    }
-};
-
-export const revisionProblemsController = async (req, res) => {
-    try {
-        const { userid, problemid } = req.body;
-
-        // Find the problem by its ID
-        const problem = await problemsProgress.findOne({ problemid });
-
-        if (!problem) {
-            // If problem not found, return 404
-            return res.status(404).send({
-                success: false,
-                message: "Problem not found"
-            });
-        }
-
-        // Check if the user already exists in problemForRevision to prevent duplication
-        if (!problem.revisionProblems.includes(userid)) {
-            // Add user to problemForRevision array
-            problem.revisionProblems.push(userid);
-        } else {
-            // If user already in problemForRevision, return success message
-            return res.status(200).send({
-                success: true,
-                message: "Problem is already marked for revision"
-            });
-        }
-
-        // Save the updated problem document
-        await problem.save();
-
-        return res.status(200).send({
-            success: true,
-            message: "Problem marked for revision successfully"
-        });
-    } catch (err) {
-        console.error("Error while marking problem for revision:", err);
-        return res.status(500).send({
-            success: false,
-            message: "An error occurred while marking the problem for revision"
+            message: "An error occurred while updating the problem status"
         });
     }
 };

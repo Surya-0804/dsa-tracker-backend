@@ -28,6 +28,10 @@ const problemsProgress = new mongoose.Schema({
         type: [String],
         default: []
     },
+    unsolvedProblems: {
+        type: [String],
+        default: []
+    },
     revisionProblems: {
         type: [String],
         default: []
