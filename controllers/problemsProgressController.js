@@ -43,7 +43,7 @@ export const favController = async (req, res) => {
         const { userId, problemId } = req.body;
 
         // Find the problem by its ID
-        const problem = await problemsProgress.findOne({ problemId });
+        const problem = await problemsProgress.findOne({ userId });
 
         if (!problem) {
             // If problem not found, return 404
@@ -54,9 +54,9 @@ export const favController = async (req, res) => {
         }
 
         // Check if the user already exists in favorites to prevent duplication
-        if (!problem.favourites.includes(userId)) {
+        if (!problem.favourites.includes(problemId)) {
             // Add user to favorites array
-            problem.favourites.push(userId);
+            problem.favourites.push(problemId);
         } else {
             // If user already in favorites, return success message
             return res.status(200).send({
@@ -147,6 +147,11 @@ export const problemStatusController = async (req, res) => {
         if (!problem) {
             // If user progress not found, create a new document
             problem = new problemsProgress({ userId });
+            problem[statusArrays[status]].push(problemId);
+            return res.status(200).send({
+                success: true,
+                message: `Problem is already marked as ${status}`
+            });
         }
 
         // Check if the problemId is already in the specified status array
