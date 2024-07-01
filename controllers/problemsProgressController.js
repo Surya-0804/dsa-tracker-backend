@@ -145,9 +145,10 @@ export const problemStatusController = async (req, res) => {
             // If user progress not found, create a new document
             problem = new problemsProgress({ userId });
             problem[statusArrays[status]].push(problemId);
+            await problem.save();
             return res.status(200).send({
                 success: true,
-                message: `Problem is already marked as ${status}`
+                message: `Problem is  marked as ${status}`
             });
         }
 
