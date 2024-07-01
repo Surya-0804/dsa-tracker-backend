@@ -4,14 +4,12 @@ export const bookmarkController = async (req, res) => {
     try {
         const { userId, problemId } = req.body;
 
-        // Find the user's progress record or create a new one if not found
         let progress = await problemsProgress.findOne({ userId });
 
         if (!progress) {
-            // If user progress doesn't exist, create a new record
             progress = new problemsProgress({
                 userId,
-                bookmarks: [problemId] // Start with the initial bookmark
+                bookmarks: [problemId]
             });
         } else {
             if (!progress.bookmarks.includes(problemId)) {
