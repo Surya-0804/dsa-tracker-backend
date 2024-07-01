@@ -46,10 +46,14 @@ export const favController = async (req, res) => {
         const problem = await problemsProgress.findOne({ userId });
 
         if (!problem) {
-            // If problem not found, return 404
-            return res.status(404).send({
-                success: false,
-                message: "Problem not found"
+            problem = new problemsProgress({
+                userId,
+                favourites: [problemId]
+            });
+            await problem.save();
+            return res.status(200).send({
+                success: true,
+                message: "successfull"
             });
         }
 
@@ -133,13 +137,6 @@ export const problemStatusController = async (req, res) => {
             revision: 'revisionProblems'
         };
 
-        // Validate status
-        if (!statusArrays[status]) {
-            return res.status(400).send({
-                success: false,
-                message: "Invalid status provided"
-            });
-        }
 
         // Find the problem by its userId
         let problem = await problemsProgress.findOne({ userId });
