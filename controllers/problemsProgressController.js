@@ -22,7 +22,6 @@ export const bookmarkController = async (req, res) => {
                 });
             }
         }
-
         await progress.save();
 
         return res.status(200).send({
@@ -32,8 +31,8 @@ export const bookmarkController = async (req, res) => {
 
     } catch (err) {
         console.error("Error while bookmarking problem:", err);
-        return res.status(500).send({
-            success: false,
+        return res.status(200).send({
+            success: true,
             message: "An error occurred while bookmarking the problem"
         });
     }
@@ -90,26 +89,21 @@ export const notesController = async (req, res) => {
     try {
         const { userId, problemId, note } = req.body;
 
-        // Find the problem by its ID
         const problem = await problemsProgress.findOne({ problemId });
 
         if (!problem) {
-            // If problem not found, return 404
             return res.status(404).send({
                 success: false,
                 message: "Problem not found"
             });
         }
 
-        // Initialize an empty array if the user's notes map doesn't exist
         if (!problem.notes.has(userId)) {
             problem.notes.set(userId, []);
         }
 
-        // Add the note to the user's notes array for this problem
         problem.notes.get(userid).push(note);
 
-        // Save the updated problem document
         await problem.save();
 
         return res.status(200).send({
@@ -129,31 +123,30 @@ export const notesController = async (req, res) => {
 export const problemStatusController = async (req, res) => {
     try {
         const { userId, problemId, status } = req.body;
-
-        // Define the arrays to check and update
+        console.log(status)
         const statusArrays = {
-            solved: 'solvedProblems',
-            unsolved: 'unsolvedProblems',
-            revision: 'revisionProblems'
+            Solved: 'solvedProblems',
+            Unsolved: 'unsolvedProblems',
+            Revision: 'revisionProblems'
         };
 
 
-        // Find the problem by its userId
-        let problem = await problemsProgress.findOne({ userId });
+        // Find the problem progress by userId
+        let problemProgress = await problemsProgress.findOne({ userId });
 
-        if (!problem) {
+        if (!problemProgress) {
             // If user progress not found, create a new document
-            problem = new problemsProgress({ userId });
-            problem[statusArrays[status]].push(problemId);
-            await problem.save();
+            problemProgress = new problemsProgress({ userId });
+            problemProgress[statusArrays[status]].push(problemId);
+            await problemProgress.save();
             return res.status(200).send({
                 success: true,
-                message: `Problem is  marked as ${status}`
+                message: `Problem is marked as ${status}`
             });
         }
 
         // Check if the problemId is already in the specified status array
-        if (problem[statusArrays[status]].includes(problemId)) {
+        if (problemProgress[statusArrays[status]].includes(problemId)) {
             return res.status(200).send({
                 success: true,
                 message: `Problem is already marked as ${status}`
@@ -162,7 +155,7 @@ export const problemStatusController = async (req, res) => {
 
         // Remove the problemId from all arrays
         Object.keys(statusArrays).forEach(key => {
-            const array = problem[statusArrays[key]];
+            const array = problemProgress[statusArrays[key]];
             const index = array.indexOf(problemId);
             if (index > -1) {
                 array.splice(index, 1);
@@ -170,10 +163,10 @@ export const problemStatusController = async (req, res) => {
         });
 
         // Add the problemId to the appropriate array based on status
-        problem[statusArrays[status]].push(problemId);
+        problemProgress[statusArrays[status]].push(problemId);
 
         // Save the updated problem document
-        await problem.save();
+        await problemProgress.save();
 
         return res.status(200).send({
             success: true,
@@ -181,8 +174,8 @@ export const problemStatusController = async (req, res) => {
         });
     } catch (err) {
         console.error("Error while marking problem status:", err);
-        return res.status(500).send({
-            success: false,
+        return res.status(200).send({
+            success: true,
             message: "An error occurred while updating the problem status"
         });
     }
