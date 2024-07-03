@@ -87,36 +87,40 @@ export const favController = async (req, res) => {
 
 export const notesController = async (req, res) => {
     try {
-        const { userId, problemId, note } = req.body;
+        const { userId, problemId, notes } = req.body;
 
-        const problem = await problemsProgress.findOne({ problemId });
+        try {
+            let problem = await problemsProgress.findOne({ userId });
 
-        if (!problem) {
-            return res.status(404).send({
+            if (!problem) {
+                problem = new problemsProgress({
+                    userId,
+                    notes: {
+                        [problemId]: [notes]
+                    }
+                });
+            } else {
+                if (!problem.notes.has(problemId)) {
+                    problem.notes.set(problemId, [notes]);
+                } else {
+                    problem.notes.get(problemId).push(notes);
+                }
+            }
+
+            await problem.save();
+
+            return res.status(200).send({
+                success: true,
+                message: "Note added successfully",
+                notes: problem.notes
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(300).send({
                 success: false,
-                message: "Problem not found"
+                message: "An error occurred while adding the note"
             });
         }
-
-        if (!problem.notes.has(userId)) {
-            problem.notes.set(userId, []);
-        }
-
-        problem.notes.get(userid).push(note);
-
-        await problem.save();
-
-        return res.status(200).send({
-            success: true,
-            message: "Note added successfully"
-        });
-    } catch (err) {
-        console.error("Error while adding note:", err);
-        return res.status(500).send({
-            success: false,
-            message: "An error occurred while adding the note",
-            error: err.message
-        });
     }
 };
 
