@@ -1,11 +1,9 @@
 import express from 'express';
-import { userStatsController } from '../controllers/userStatsController.js';
+import { completeUserStats } from '../controllers/userStatsController.js';
 import authenticateToken from '../middlewares/authenticateToken.js';
 
 const router = express.Router();
 
-//routing
-
-router.post("/completeUserStats", authenticateToken, userStatsController);
+router.post("/completeUserStats", authenticateToken, completeUserStats);
 
 export default router;

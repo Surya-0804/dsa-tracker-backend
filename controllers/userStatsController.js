@@ -1,10 +1,5 @@
-import dsaTracker from "../models/problemSchema.js";
-import users from '../models/users.js';
-import userProblems from '../models/userProblems.js'
-
-import problemsProgress from '../models/problemsProgress';
-
-export const getUserStats = async (req, res) => {
+import problemsProgress from "../models/problemsProgress.js";
+export const completeUserStats = async (req, res) => {
     try {
         const { userId } = req.body;
 

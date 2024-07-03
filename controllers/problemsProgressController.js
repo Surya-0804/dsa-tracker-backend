@@ -122,6 +122,13 @@ export const notesController = async (req, res) => {
             });
         }
     }
+    catch (err) {
+        console.error("Error while favoriting problem:", err);
+        return res.status(500).send({
+            success: false,
+            message: "An error occurred while favoriting the problem"
+        });
+    }
 };
 
 export const problemStatusController = async (req, res) => {
