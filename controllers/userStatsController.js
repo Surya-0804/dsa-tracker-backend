@@ -2,17 +2,27 @@ import dsaTracker from "../models/problemSchema.js";
 import users from '../models/users.js';
 import userProblems from '../models/userProblems.js'
 
+import problemsProgress from '../models/problemsProgress';
+
 export const getUserStats = async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const { userId } = req.body;
 
+        const userProblems = await problemsProgress.findOne({ userId });
         if (!userProblems) {
-            return res.status(404).json({ message: "User problems not found" });
+            userProblems = new problemsProgress({
+                userId,
+                bookmarks: [],
+                favourites: [],
+                notes: new Map(),
+                solutions: new Map(),
+                solvedProblems: [],
+                unsolvedProblems: [],
+                revisionProblems: []
+            });
+
+            await userProblems.save();
         }
-
-        // Fetch all problems
-        const problems = await Problem.find();
-
         // Initialize stats
         let totalProblems = 0;
         let totalFavourites = 0;
@@ -24,31 +34,36 @@ export const getUserStats = async (req, res) => {
         let mediumProblems = 0;
         let hardProblems = 0;
 
-        // Iterate through each problem and calculate stats
-        for (const problem of problems) {
-            totalProblems++;
+        // Calculate stats from the user's problem progress
+        totalProblems = userProblems.bookmarks.length + userProblems.solvedProblems.length + userProblems.unsolvedProblems.length + userProblems.revisionProblems.length;
+        totalFavourites = userProblems.favourites.length;
 
-            if (userProblems.favourites.includes(problem._id)) {
-                totalFavourites++;
-            }
+        userProblems.notes.forEach(noteArray => {
+            totalNotes += noteArray.length;
+        });
 
-            if (userProblems.notes.has(problem._id)) {
-                totalNotes += userProblems.notes.get(problem._id).length;
-            }
+        userProblems.solutions.forEach(solutionArray => {
+            totalSolutions += solutionArray.length;
+        });
 
-            if (userProblems.solutions.includes(problem._id)) {
-                totalSolutions++;
-            }
+        totalProblemsSolved = userProblems.solvedProblems.length;
+        totalProblemsForRevision = userProblems.revisionProblems.length;
 
-            if (userProblems.problemSolved.includes(problem._id)) {
-                totalProblemsSolved++;
-            }
+        // Assuming that you have some way to determine the difficulty level of the problems
+        const allProblems = [
+            ...userProblems.bookmarks,
+            ...userProblems.solvedProblems,
+            ...userProblems.unsolvedProblems,
+            ...userProblems.revisionProblems
+        ];
 
-            if (userProblems.problemForRevision.includes(problem._id)) {
-                totalProblemsForRevision++;
-            }
+        for (const problemId of allProblems) {
+            // Fetch problem details using problemId if you have a separate problem details collection
+            // For the sake of example, assuming a getProblemById function
+            const problemDetails = await getProblemById(problemId); // You need to implement this function or query
+            if (!problemDetails) continue;
 
-            switch (problem.Difficulty.toLowerCase()) {
+            switch (problemDetails.difficulty.toLowerCase()) {
                 case 'easy':
                     easyProblems++;
                     break;
@@ -83,3 +98,4 @@ export const getUserStats = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+

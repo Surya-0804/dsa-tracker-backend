@@ -10,6 +10,7 @@ import dsaTrackerRoute from "./routes/dsaTrackerRoute.js";
 import authRoute from './routes/authRoute.js';
 import corsHandler from "./allowCors.js";
 import problemsProgressRoute from './routes/problemsProgressRoute.js'
+import userStatsRoute from './routes/userStatsRoute.js'
 
 // Initialize express app
 const app = express();
@@ -46,6 +47,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use("/", dsaTrackerRoute);
 app.use("/auth", authRoute);
 app.use("/problemProgress", problemsProgressRoute);
+app.use("/stats", userStatsRoute)
 
 // Start the server
 const PORT = process.env.PORT
