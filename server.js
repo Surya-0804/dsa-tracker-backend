@@ -12,19 +12,14 @@ import corsHandler from "./allowCors.js";
 import problemsProgressRoute from './routes/problemsProgressRoute.js'
 import userStatsRoute from './routes/userStatsRoute.js'
 
-// Initialize express app
 const app = express();
 
-// Load environment variables
 dotenv.config();
 
-// Connect to the database
 connectDB();
 
-// Middleware for logging requests
 app.use(morgan('dev'));
 
-// CORS setup
 const corsOptions = {
   origin: [process.env.CLIENT_URL, 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3000', 'https://dsa-tracker-website.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -34,22 +29,17 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Use CORS handler middleware if you need to set custom headers
-
-// Define your routes
 app.use("/", dsaTrackerRoute);
 app.use("/auth", authRoute);
 app.use("/problemProgress", problemsProgressRoute);
 app.use("/stats", userStatsRoute)
 
-// Start the server
 const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Backend server started at port ${PORT}`.green);
