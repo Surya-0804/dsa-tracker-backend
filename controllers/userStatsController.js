@@ -30,7 +30,7 @@ export const completeUserStats = async (req, res) => {
         let hardProblems = 0;
 
         // Calculate stats from the user's problem progress
-        totalProblems = userProblems.bookmarks.length + userProblems.solvedProblems.length + userProblems.unsolvedProblems.length + userProblems.revisionProblems.length;
+        totalProblems = 450;
         totalFavourites = userProblems.favourites.length;
 
         userProblems.notes.forEach(noteArray => {
