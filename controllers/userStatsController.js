@@ -60,6 +60,17 @@ export const completeUserStats = async (req, res) => {
     }
 };
 
+export const completeUserData = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = problemsProgress.findOne({ userId });
+        return res.status(200).json({ user });
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+}
+
 export const topicWiseStats = async (req, res) => {
     try {
         const { userId } = req.body;
