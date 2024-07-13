@@ -1,6 +1,7 @@
 import express from 'express';
 import { completeUserStats, topicWiseStats } from '../controllers/userStatsController.js';
 import authenticateToken from '../middlewares/authenticateToken.js';
+import { completeUserData } from '../controllers/userStatsController.js';
 
 const router = express.Router();
 
