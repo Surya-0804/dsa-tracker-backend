@@ -54,6 +54,7 @@ export const registerController = async (req, res) => {
                 password: "Field must not be empty",
                 phoneNo: "Field must not be empty"
             };
+            console.log("Field must not")
             return res.status(400).json({ error });
         }
 
@@ -88,8 +89,6 @@ export const registerController = async (req, res) => {
             const newUser = new userModel({ name: toTitleCase(name), email, password: hashedPassword, phoneNo, isGoogleUser: false });
             await newUser.save();
         }
-
-
 
         return res.json({ success: "Account created successfully. Please login" });
 

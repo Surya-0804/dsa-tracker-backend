@@ -7,5 +7,5 @@ const router = express.Router();
 
 router.post("/completeUserStats", authenticateToken, completeUserStats);
 router.post("/topicWiseStats", authenticateToken, topicWiseStats);
-router.post("/completeUserData", authenticateToken, completeUserData);
+router.post("/completeUserData", authenticateToken, completeUserStats);
 export default router;

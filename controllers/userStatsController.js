@@ -4,8 +4,7 @@ import dsaTracker from "../models/problemSchema.js";
 export const completeUserStats = async (req, res) => {
     try {
         const { userId } = req.body;
-
-        const userProblems = await problemsProgress.findOne({ userId });
+        let userProblems = await problemsProgress.findOne({ userId });
         if (!userProblems) {
             userProblems = new problemsProgress({
                 userId,
@@ -17,23 +16,16 @@ export const completeUserStats = async (req, res) => {
                 unsolvedProblems: [],
                 revisionProblems: []
             });
-
+            console.log(userProblems)
             await userProblems.save();
         }
-        // Initialize stats
-        let totalProblems = 0;
-        let totalFavourites = 0;
+
+        const totalProblems = 450;
+        const totalFavourites = userProblems.favourites.length;
         let totalNotes = 0;
         let totalSolutions = 0;
-        let totalProblemsSolved = 0;
-        let totalProblemsForRevision = 0;
-        let easyProblems = 0;
-        let mediumProblems = 0;
-        let hardProblems = 0;
-
-        // Calculate stats from the user's problem progress
-        totalProblems = 450;
-        totalFavourites = userProblems.favourites.length;
+        const totalProblemsSolved = userProblems.solvedProblems.length;
+        const totalProblemsForRevision = userProblems.revisionProblems.length;
 
         userProblems.notes.forEach(noteArray => {
             totalNotes += noteArray.length;
@@ -43,9 +35,6 @@ export const completeUserStats = async (req, res) => {
             totalSolutions += solutionArray.length;
         });
 
-        totalProblemsSolved = userProblems.solvedProblems.length;
-        totalProblemsForRevision = userProblems.revisionProblems.length;
-
         const stats = {
             totalProblems,
             totalFavourites,
@@ -53,7 +42,14 @@ export const completeUserStats = async (req, res) => {
             totalSolutions,
             totalProblemsSolved,
             totalProblemsForRevision,
+            bookmarks: userProblems.bookmarks,
+            favourites: userProblems.favourites,
+            notes: Array.from(userProblems.notes),
+            solutions: Array.from(userProblems.solutions),
+            solvedProblems: userProblems.solvedProblems,
+            revisionProblems: userProblems.revisionProblems,
         };
+        console.log(stats)
         return res.status(200).json({ stats });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error: error.message });
@@ -64,12 +60,14 @@ export const completeUserData = async (req, res) => {
     try {
         const { userId } = req.body;
         const user = await problemsProgress.findOne({ userId });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
         return res.status(200).json({ user });
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
-}
+};
 
 export const topicWiseStats = async (req, res) => {
     try {
@@ -98,9 +96,14 @@ export const topicWiseStats = async (req, res) => {
         const mediumProblems = [];
         const hardProblems = [];
 
-        for (const problemId of solvedProblems) {
-            const problem = await dsaTracker.findOne({ _id: problemId });
+        for (const problemData of solvedProblems) {
+            const problem = await dsaTracker.findOne({ _id: problemData.value });
             if (problem) {
+                const problemInfo = {
+                    id: problem._id,
+                    title: problem.Problem,
+                    timestamp: problemData.timestamp
+                };
 
                 if (topicWiseCount[problem.Topic]) {
                     topicWiseCount[problem.Topic]++;
@@ -108,7 +111,6 @@ export const topicWiseStats = async (req, res) => {
                     topicWiseCount[problem.Topic] = 1;
                 }
 
-                const problemInfo = { id: problem._id, title: problem.Problem };
                 if (problem.Difficulty === 'Easy') {
                     easyProblems.push(problemInfo);
                 } else if (problem.Difficulty === 'Medium') {

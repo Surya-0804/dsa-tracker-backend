@@ -3,18 +3,23 @@ import problemsProgress from "../models/problemsProgress.js";
 export const bookmarkController = async (req, res) => {
     try {
         const { userId, problemId } = req.body;
-        console.log(problemId)
 
         let progress = await problemsProgress.findOne({ userId });
 
+        const timestampedBookmark = {
+            value: problemId,
+            timestamp: new Date()
+        };
+        console.log(timestampedBookmark)
         if (!progress) {
             progress = new problemsProgress({
                 userId,
-                bookmarks: [problemId]
+                bookmarks: [timestampedBookmark]
             });
+            console.log(progress)
         } else {
-            if (!progress.bookmarks.includes(problemId)) {
-                progress.bookmarks.push(problemId);
+            if (!progress.bookmarks.some(bookmark => bookmark.value === problemId)) {
+                progress.bookmarks.push(timestampedBookmark);
             } else {
                 return res.status(200).send({
                     success: true,
@@ -22,6 +27,7 @@ export const bookmarkController = async (req, res) => {
                 });
             }
         }
+
         await progress.save();
 
         return res.status(200).send({
@@ -31,44 +37,40 @@ export const bookmarkController = async (req, res) => {
 
     } catch (err) {
         console.error("Error while bookmarking problem:", err);
-        return res.status(200).send({
-            success: true,
+        return res.status(500).send({
+            success: false,
             message: "An error occurred while bookmarking the problem"
         });
     }
 };
+
 export const favController = async (req, res) => {
     try {
         const { userId, problemId } = req.body;
 
-        // Find the problem by its ID
-        const problem = await problemsProgress.findOne({ userId });
+        let problem = await problemsProgress.findOne({ userId });
+
+        const timestampedFavourite = {
+            value: problemId,
+            timestamp: new Date()
+        };
 
         if (!problem) {
             problem = new problemsProgress({
                 userId,
-                favourites: [problemId]
+                favourites: [timestampedFavourite]
             });
-            await problem.save();
-            return res.status(200).send({
-                success: true,
-                message: "successfull"
-            });
-        }
-
-        // Check if the user already exists in favorites to prevent duplication
-        if (!problem.favourites.includes(problemId)) {
-            // Add user to favorites array
-            problem.favourites.push(problemId);
         } else {
-            // If user already in favorites, return success message
-            return res.status(200).send({
-                success: true,
-                message: "Problem is already favorited"
-            });
+            if (!problem.favourites.some(favourite => favourite.value === problemId)) {
+                problem.favourites.push(timestampedFavourite);
+            } else {
+                return res.status(200).send({
+                    success: true,
+                    message: "Problem is already favorited"
+                });
+            }
         }
 
-        // Save the updated problem document
         await problem.save();
 
         return res.status(200).send({
@@ -85,98 +87,89 @@ export const favController = async (req, res) => {
 };
 
 
+
 export const notesController = async (req, res) => {
     try {
         const { userId, problemId, notes } = req.body;
 
-        try {
-            let problem = await problemsProgress.findOne({ userId });
+        let problem = await problemsProgress.findOne({ userId });
 
-            if (!problem) {
-                problem = new problemsProgress({
-                    userId,
-                    notes: {
-                        [problemId]: [notes]
-                    }
-                });
-            } else {
-                if (!problem.notes.has(problemId)) {
-                    problem.notes.set(problemId, [notes]);
-                } else {
-                    problem.notes.get(problemId).push(notes);
+        const timestampedNotes = {
+            value: notes,
+            timestamp: new Date()
+        };
+
+        if (!problem) {
+            problem = new problemsProgress({
+                userId,
+                notes: {
+                    [problemId]: [timestampedNotes]
                 }
+            });
+        } else {
+            if (!problem.notes.has(problemId)) {
+                problem.notes.set(problemId, [timestampedNotes]);
+            } else {
+                problem.notes.get(problemId).push(timestampedNotes);
             }
-
-            await problem.save();
-
-            return res.status(200).send({
-                success: true,
-                message: "Note added successfully",
-                notes: problem.notes
-            });
-        } catch (error) {
-            console.error(error);
-            return res.status(300).send({
-                success: false,
-                message: "An error occurred while adding the note"
-            });
         }
-    }
-    catch (err) {
-        console.error("Error while favoriting problem:", err);
+
+        await problem.save();
+
+        return res.status(200).send({
+            success: true,
+            message: "Note added successfully",
+            notes: problem.notes
+        });
+    } catch (err) {
+        console.error("Error while adding note:", err);
         return res.status(500).send({
             success: false,
-            message: "An error occurred while favoriting the problem"
+            message: "An error occurred while adding the note"
         });
     }
 };
 
+
 export const problemStatusController = async (req, res) => {
     try {
         const { userId, problemId, status } = req.body;
-        console.log(status)
+
         const statusArrays = {
             Solved: 'solvedProblems',
             Unsolved: 'unsolvedProblems',
             Revision: 'revisionProblems'
         };
 
+        const timestampedStatus = {
+            value: problemId,
+            timestamp: new Date()
+        };
 
-        // Find the problem progress by userId
         let problemProgress = await problemsProgress.findOne({ userId });
 
         if (!problemProgress) {
-            // If user progress not found, create a new document
             problemProgress = new problemsProgress({ userId });
-            problemProgress[statusArrays[status]].push(problemId);
-            await problemProgress.save();
-            return res.status(200).send({
-                success: true,
-                message: `Problem is marked as ${status}`
-            });
-        }
-
-        // Check if the problemId is already in the specified status array
-        if (problemProgress[statusArrays[status]].includes(problemId)) {
-            return res.status(200).send({
-                success: true,
-                message: `Problem is already marked as ${status}`
-            });
-        }
-
-        // Remove the problemId from all arrays
-        Object.keys(statusArrays).forEach(key => {
-            const array = problemProgress[statusArrays[key]];
-            const index = array.indexOf(problemId);
-            if (index > -1) {
-                array.splice(index, 1);
+            problemProgress[statusArrays[status]].push(timestampedStatus);
+        } else {
+            if (problemProgress[statusArrays[status]].some(entry => entry.value === problemId)) {
+                return res.status(200).send({
+                    success: true,
+                    message: `Problem is already marked as ${status}`
+                });
             }
-        });
 
-        // Add the problemId to the appropriate array based on status
-        problemProgress[statusArrays[status]].push(problemId);
+            Object.keys(statusArrays).forEach(key => {
+                const array = problemProgress[statusArrays[key]];
+                const index = array.findIndex(entry => entry.value === problemId);
+                if (index > -1) {
+                    array.splice(index, 1);
+                }
+            });
 
-        // Save the updated problem document
+            problemProgress[statusArrays[status]].push(timestampedStatus);
+        }
+
         await problemProgress.save();
 
         return res.status(200).send({
@@ -185,8 +178,8 @@ export const problemStatusController = async (req, res) => {
         });
     } catch (err) {
         console.error("Error while marking problem status:", err);
-        return res.status(200).send({
-            success: true,
+        return res.status(500).send({
+            success: false,
             message: "An error occurred while updating the problem status"
         });
     }
