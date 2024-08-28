@@ -60,5 +60,4 @@ const ProblemsProgressSchema = new mongoose.Schema({
         default: []
     }
 });
-
 export default mongoose.model('ProblemsProgress', ProblemsProgressSchema);

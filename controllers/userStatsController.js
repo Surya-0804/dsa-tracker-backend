@@ -4,7 +4,13 @@ import dsaTracker from "../models/problemSchema.js";
 export const completeUserStats = async (req, res) => {
     try {
         const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
         let userProblems = await problemsProgress.findOne({ userId });
+        console.log("sdfjsdif :", userProblems);
+
         if (!userProblems) {
             userProblems = new problemsProgress({
                 userId,
@@ -16,24 +22,27 @@ export const completeUserStats = async (req, res) => {
                 unsolvedProblems: [],
                 revisionProblems: []
             });
-            console.log(userProblems)
             await userProblems.save();
         }
 
         const totalProblems = 450;
-        const totalFavourites = userProblems.favourites.length;
+        const totalFavourites = userProblems.favourites ? userProblems.favourites.length : 0;
         let totalNotes = 0;
         let totalSolutions = 0;
-        const totalProblemsSolved = userProblems.solvedProblems.length;
-        const totalProblemsForRevision = userProblems.revisionProblems.length;
+        const totalProblemsSolved = userProblems.solvedProblems ? userProblems.solvedProblems.length : 0;
+        const totalProblemsForRevision = userProblems.revisionProblems ? userProblems.revisionProblems.length : 0;
 
-        userProblems.notes.forEach(noteArray => {
-            totalNotes += noteArray.length;
-        });
+        if (userProblems.notes) {
+            userProblems.notes.forEach(noteArray => {
+                totalNotes += noteArray.length;
+            });
+        }
 
-        userProblems.solutions.forEach(solutionArray => {
-            totalSolutions += solutionArray.length;
-        });
+        if (userProblems.solutions) {
+            userProblems.solutions.forEach(solutionArray => {
+                totalSolutions += solutionArray.length;
+            });
+        }
 
         const stats = {
             totalProblems,
@@ -42,19 +51,22 @@ export const completeUserStats = async (req, res) => {
             totalSolutions,
             totalProblemsSolved,
             totalProblemsForRevision,
-            bookmarks: userProblems.bookmarks,
-            favourites: userProblems.favourites,
-            notes: Array.from(userProblems.notes),
-            solutions: Array.from(userProblems.solutions),
-            solvedProblems: userProblems.solvedProblems,
-            revisionProblems: userProblems.revisionProblems,
+            bookmarks: userProblems.bookmarks || [],
+            favourites: userProblems.favourites || [],
+            notes: Array.from(userProblems.notes ? userProblems.notes.entries() : []),
+            solutions: Array.from(userProblems.solutions ? userProblems.solutions.entries() : []),
+            solvedProblems: userProblems.solvedProblems || [],
+            revisionProblems: userProblems.revisionProblems || [],
         };
-        console.log(stats)
+
         return res.status(200).json({ stats });
     } catch (error) {
+        console.error("Error in completeUserStats:", error);
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+
+
 
 export const completeUserData = async (req, res) => {
     try {
