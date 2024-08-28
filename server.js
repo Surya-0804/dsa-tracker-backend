@@ -11,7 +11,7 @@ import authRoute from './routes/authRoute.js';
 import corsHandler from "./allowCors.js";
 import problemsProgressRoute from './routes/problemsProgressRoute.js'
 import userStatsRoute from './routes/userStatsRoute.js'
-
+import scrapedCodingStatsRoute from './routes/scrapedCodingStatsRoute.js'
 const app = express();
 
 dotenv.config();
@@ -39,7 +39,7 @@ app.use("/", dsaTrackerRoute);
 app.use("/auth", authRoute);
 app.use("/problemProgress", problemsProgressRoute);
 app.use("/stats", userStatsRoute)
-
+app.use("/codingStats", scrapedCodingStatsRoute)
 const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Backend server started at port ${PORT}`.green);
