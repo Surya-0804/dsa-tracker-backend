@@ -41,6 +41,42 @@ app.use("/problemProgress", problemsProgressRoute);
 app.use("/stats", userStatsRoute)
 app.use("/codingStats", scrapedCodingStatsRoute)
 const PORT = process.env.PORT
+
+app.get("/", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>DSA Tracker Backend</title>
+      <style>
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          font-family: Arial, sans-serif;
+          background-color: #f0f0f0;
+        }
+        .container {
+          text-align: center;
+        }
+        h1 {
+          color: #333;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>Welcome to DSA Tracker Backend</h1>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
 app.listen(PORT, () => {
   console.log(`Backend server started at port ${PORT}`.green);
 });
