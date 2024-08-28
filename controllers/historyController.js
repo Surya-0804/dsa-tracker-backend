@@ -1,5 +1,5 @@
-import userHistory from '../models/userHistory';
-import dsaTracker from '../models/dsaTracker'; // Assuming this is your DSA tracker model
+import userHistory from '../models/userHistory.js';
+
 
 export const historyController = async (req, res) => {
     try {

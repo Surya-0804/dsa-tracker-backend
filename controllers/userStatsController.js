@@ -1,6 +1,7 @@
 import problemsProgress from "../models/problemsProgress.js";
-import dsaTracker from "../models/problemSchema.js";
 import userScores from '../models/userScores.js'
+import dsaTracker from "../models/problemSchema.js";
+
 
 export const completeUserStats = async (req, res) => {
     try {
@@ -82,7 +83,7 @@ export const completeUserData = async (req, res) => {
     }
 };
 
-const leaderBoardStats = async (req, res) => {
+export const leaderBoardStats = async (req, res) => {
     try {
         const leaderboardStats = await userScores.findOne({});
         return res.status(200).json({ leaderboardStats })
