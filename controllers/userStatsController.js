@@ -1,5 +1,6 @@
 import problemsProgress from "../models/problemsProgress.js";
 import dsaTracker from "../models/problemSchema.js";
+import userScores from '../models/userScores.js'
 
 export const completeUserStats = async (req, res) => {
     try {
@@ -80,6 +81,15 @@ export const completeUserData = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 };
+
+const leaderBoardStats = async (req, res) => {
+    try {
+        const leaderboardStats = await userScores.findOne({});
+        return res.status(200).json({ leaderboardStats })
+    } catch (err) {
+        return res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
 
 export const topicWiseStats = async (req, res) => {
     try {

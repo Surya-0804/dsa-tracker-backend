@@ -43,5 +43,5 @@ def get_leetcode_stats(username):
         print(profile_svg, profile_name)
 
 if __name__ == "__main__":
-    username = sys.argv[1]
+    username = "gantavenkatakousik2021"
     get_leetcode_stats(username)

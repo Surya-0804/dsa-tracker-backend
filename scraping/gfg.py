@@ -71,5 +71,5 @@ def get_gfg_stats(username):
 
 if __name__ == "__main__":
     # Get username from command line arguments
-    username = sys.argv[1]
+    username ="gantavenkatakousik2021"
     get_gfg_stats(username)
