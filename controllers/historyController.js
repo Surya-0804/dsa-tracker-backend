@@ -1,50 +1,38 @@
 import userHistory from '../models/userHistory.js';
 
 
-export const historyController = async (req, res) => {
+export const fetchHistoryController = async (req, res) => {
     try {
-        const { userId, problemId, problemTitle, problemDifficulty } = req.body;
+        const { userId } = req.body;
 
-        // Check if userId and problemId are present
-        if (!userId || !problemId || !problemTitle || !problemDifficulty) {
+        if (!userId) {
             return res.status(400).json({
                 success: false,
-                message: 'Missing required fields: userId, problemId, problemTitle, and problemDifficulty are required.',
+                message: 'User ID is required',
             });
         }
 
-        let userHistoryDoc = await userHistory.findOne({ userId });
+        const history = await userHistory.findOne({ userId });
 
-        if (!userHistoryDoc) {
-            userHistoryDoc = new userHistory({ userId, data: [] });
-        }
-
-        const existingProblem = userHistoryDoc.data.find(
-            (entry) => entry.problem.id === problemId
-        );
-
-        if (!existingProblem) {
-            userHistoryDoc.data.push({
-                title: { value: problemTitle },
-                problem: {
-                    id: problemId,
-                    title: problemTitle,
-                    difficulty: problemDifficulty,
-                },
+        if (!history) {
+            return res.status(404).json({
+                success: false,
+                message: 'No history found for the provided user ID',
             });
-
-            await userHistoryDoc.save();
         }
 
         return res.status(200).json({
             success: true,
-            message: 'Problem added to user history successfully.',
+            data: history,
+            message: 'User history retrieved successfully',
         });
+
     } catch (err) {
-        console.error('Error updating user history:', err);
+        console.error('Error fetching user history:', err);
         return res.status(500).json({
             success: false,
             message: 'Internal Server Error',
+            error: err.message,
         });
     }
 };

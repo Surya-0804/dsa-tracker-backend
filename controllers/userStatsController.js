@@ -2,7 +2,6 @@ import problemsProgress from "../models/problemsProgress.js";
 import userScores from '../models/userScores.js'
 import dsaTracker from "../models/problemSchema.js";
 
-
 export const completeUserStats = async (req, res) => {
     try {
         const { userId } = req.body;
@@ -67,8 +66,6 @@ export const completeUserStats = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
-
-
 
 export const completeUserData = async (req, res) => {
     try {
