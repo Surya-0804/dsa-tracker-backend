@@ -8,7 +8,7 @@ export const bookmarkController = async (req, res) => {
         const { userId, problemId } = req.body;
 
         // Fetch problem details
-        const problem = await problemSchema.findOne({ Problem: problemId });
+        const problem = await problemSchema.findOne({ _id: problemId });
         const problemTitle = problem ? problem.Problem : 'N/A';
         const problemDifficulty = problem ? problem.Difficulty : 'N/A';
 
@@ -92,7 +92,7 @@ export const favController = async (req, res) => {
         const { userId, problemId } = req.body;
 
         // Fetch problem details
-        const problem = await problemSchema.findOne({ Problem: problemId });
+        const problem = await problemSchema.findOne({ _id: problemId });
         const problemTitle = problem ? problem.Problem : 'N/A';
         const problemDifficulty = problem ? problem.Difficulty : 'N/A';
 
@@ -178,7 +178,7 @@ export const notesController = async (req, res) => {
         const { userId, problemId, notes } = req.body;
 
         // Fetch problem details
-        const problem = await problemSchema.findOne({ Problem: problemId });
+        const problem = await problemSchema.findOne({ _id: problemId });
         const problemTitle = problem ? problem.Problem : 'N/A';
         const problemDifficulty = problem ? problem.Difficulty : 'N/A';
 
@@ -273,7 +273,7 @@ export const problemStatusController = async (req, res) => {
         };
 
         // Fetch problem details
-        const problem = await problemSchema.findOne({ Problem: problemId });
+        const problem = await problemSchema.findOne({ _id: problemId });
         const problemTitle = problem ? problem.Problem : 'N/A';
         const problemDifficulty = problem ? problem.Difficulty : 'N/A';
 
