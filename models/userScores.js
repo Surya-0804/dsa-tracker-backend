@@ -1,25 +1,20 @@
 import mongoose from 'mongoose';
 
-// Define the schema for the objects in the array
-const ScoreSchema = new mongoose.Schema({
+
+const UserScoresSchema = new mongoose.Schema({
     userId: {
         type: String,
-        required: true,
+        required: true
     },
-    name: {
+    userName: {
         type: String,
-        required: true,
+        required: true
+    },
+    profilePic: {
+        type: String,
     },
     score: {
         type: Number,
-        required: true,
-    }
-});
-const UserScoresSchema = new mongoose.Schema({
-    scores: {
-        type: [ScoreSchema],
-        required: true,
-        default: []
     }
 });
 

@@ -3,6 +3,7 @@ import User from "../models/users.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import userStreak from "../models/userStreak.js";
+import userScores from "../models/userScores.js";
 
 export const loginController = async (req, res) => {
     try {
@@ -131,15 +132,33 @@ export const registerController = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        let newUser;
         if (isGoogleUser) {
-            const newUser = new User({ name: toTitleCase(name), email, password: hashedPassword, photoUrl, googleUid: uid, isGoogleUser: true });
-            await newUser.save();
+            newUser = new User({
+                name: toTitleCase(name),
+                email,
+                password: hashedPassword,
+                photoUrl,
+                isGoogleUser: true
+            });
+        } else {
+            newUser = new User({
+                name: toTitleCase(name),
+                email,
+                password: hashedPassword,
+                phoneNo,
+                isGoogleUser: false
+            });
         }
-        else {
-            const newUser = new User({ name: toTitleCase(name), email, password: hashedPassword, phoneNo, isGoogleUser: false });
-            await newUser.save();
-        }
+        await newUser.save();
 
+        await userScores.create({
+            userId: newUser._id,
+            userName: newUser.name,
+            profilePic: photoUrl || '',
+            score: 0
+        });
+        userScores.push({})
         return res.json({ success: "Account created successfully. Please login" });
 
     } catch (err) {
