@@ -192,22 +192,24 @@ export const gfgStats = async (req, res) => {
     try {
         const { userName } = req.body;
 
-        // Execute the Python script with the username as an argument
         exec(`python3 ../scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
                 return res.status(500).json({ success: false, error: 'Error executing Python script' });
             }
+
+            const filename = `${userName}_data.json`;
+
             try {
-                // Read and parse the output from the Python script (if stored in a JSON file)
-                fs.readFile('GFG_stats.json', 'utf8', (err, data) => {
+                fs.readFile(filename, 'utf8', (err, data) => {
                     if (err) {
                         console.error('Error reading JSON file:', err);
                         return res.status(500).json({ success: false, error: 'Error reading JSON file' });
                     }
+
                     const jsonData = JSON.parse(data);
                     console.log(jsonData);
-                    res.json(jsonData);
+                    res.json({ success: true, data: jsonData });
                 });
             } catch (parseError) {
                 console.error('Error parsing JSON:', parseError);
@@ -215,6 +217,7 @@ export const gfgStats = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error(`Internal server error: ${error.message}`);
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
