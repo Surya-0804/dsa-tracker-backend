@@ -82,7 +82,7 @@ export const completeUserData = async (req, res) => {
 
 export const leaderBoardStats = async (req, res) => {
     try {
-        const leaderboardStats = await userScores.findOne({});
+        const leaderboardStats = await userScores.find({});
         return res.status(200).json({ leaderboardStats })
     } catch (err) {
         return res.status(500).json({ message: "Internal server error", error: err.message });
