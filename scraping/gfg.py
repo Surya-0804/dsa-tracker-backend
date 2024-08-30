@@ -3,73 +3,71 @@ from bs4 import BeautifulSoup
 import json
 import sys
 
+
 def get_gfg_stats(username):
-    # Construct the URL with the username
-    url = f"https://auth.geeksforgeeks.org/user/{username}"
-    
+    url = f"https://www.geeksforgeeks.org/user/{username}/"
+
     response = requests.get(url)
-    user = BeautifulSoup(response.content, 'html.parser')
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Extracting various details
-    profile_pic_src = user.find(class_='profile_pic')['src']
+        profile_picture = soup.select_one('.profilePicSection_head_img__1GLm0 img')['src']
+        profile_handle = soup.select_one('.profilePicSection_head_userHandle__oOfFy').text
+        institution_name = soup.select_one('.educationDetails_head_left--text__tgi9I').text
+        rank = soup.select_one('.educationDetails_head_left_userRankContainer--text__wt81s').text
 
-    institute_rank = user.find(class_='profile_details_section activity-container-1 section_card') \
-                         .find(class_='profile_rank_div tooltipped') \
-                         .find(class_='rankNum').text.strip()
+        data = {}
 
-    institution = user.find(class_='col l4 m4 s12')
-    inst_name = institution.find(class_='basic_details_data').text.strip()
+        text_elements = soup.find_all('div', class_='scoreCard_head_left--text__KZ2S1')
+        score_elements = soup.find_all('div', class_='scoreCard_head_left--score__oSi_x')
 
-    streak_info = user.find(class_='streakCnt tooltipped').get_text(strip=True).split('/')
-    user_streak = streak_info[0].strip()
-    global_streak = streak_info[1].strip()
+        for text_element in text_elements:
+            text = text_element.get_text(strip=True)
+            next_sibling = text_element.find_next_sibling('div', class_='scoreCard_head_left--score__oSi_x')
+            if next_sibling:
+                score = next_sibling.get_text(strip=True)
+                data[text] = score
 
-    score_cards = user.find(class_='row score_cards_container').findAll(class_='col xl3 l6 m6 s12')
-    scores = {sc.find(class_='score_card_name').text.strip(): sc.find(class_='score_card_value').text.strip() for sc in score_cards}
+        coding_score = data.get('Coding Score', 'N/A')
+        problems_solved = data.get('Problem Solved', 'N/A')
 
-    languages_used = user.findAll(class_='col l4 m4 s12')[1].find(class_='basic_details_data').text.strip()
+        languages_used = soup.select_one('.educationDetails_head_right--text__lLOHI').text
+        best_potd_streak = soup.select_one('.circularProgressBar_head_mid_streakCnt__MFOF1').text
 
-    # Extracting the number of problems solved per difficulty level
-    problems_solved = {}
-    no_solved = user.find(class_='col xl8 l8 m8 s8 typeLangSection').findAll(class_='tab')
-    for item in no_solved:
-        difficulty, count = item.text.split(' ')
-        problems_solved[difficulty] = int(count[1:-1])  # Removing parentheses and converting count to integer
+        difficulty_data = {}
+        difficulty_elements = soup.find_all('div', class_='problemNavbar_head_nav--text__UaGCx')
 
-    # Extracting the list of solved problems
-    problem_sections = user.find(class_='col xl8 l8 m8 s8 typeLangSection').find(class_='problem_list_section').findAll(class_='row')
-    difficulty_levels = ["SCHOOL", "BASIC", "EASY", "MEDIUM", "HARD"]
-    problems = {difficulty: [] for difficulty in difficulty_levels}
+        for difficulty_element in difficulty_elements:
+            text = difficulty_element.get_text(strip=True)
+            if '(' in text and ')' in text:
+                difficulty_name = text.split('(')[0].strip()
+                difficulty_count = text.split('(')[1].split(')')[0].strip()
+                difficulty_data[difficulty_name] = difficulty_count
 
-    for i, section in enumerate(problem_sections):
-        problem_links = section.findAll('a', class_='problemLink')
-        for q in problem_links:
-            problems[difficulty_levels[i]].append({
-                "link": q['href'],
-                "title": q.text.strip()
-            })
+        result = {
+            'Profile Picture': profile_picture,
+            'Profile Handle': profile_handle,
+            'Institution Name': institution_name,
+            'Rank': rank,
+            'Coding Score': coding_score,
+            'Problems Solved': problems_solved,
+            'Languages Used': languages_used,
+            'Best POTD Streak': best_potd_streak,
+            'Difficulty Data': difficulty_data
+        }
 
-    # Organizing data into a dictionary
-    data = {
-        "profile_picture": profile_pic_src,
-        "institute_rank": institute_rank,
-        "institution_name": inst_name,
-        "user_streak": user_streak,
-        "global_streak": global_streak,
-        "scores": scores,
-        "languages_used": languages_used,
-        "problems_solved": problems_solved,
-        "problems": problems
-    }
+        filename = f"{username}_data.json"
+        with open(filename, 'w') as json_file:
+            json.dump(result, json_file, indent=4)
 
-    # Serializing the dictionary to a JSON formatted string
-    data_json = json.dumps(data, indent=4)
+        print(f"Data saved to {filename}")
 
-    # Writing the JSON data to a file
-    with open('GFG_stats.json', 'w') as file:
-        file.write(data_json)
+    else:
+        print(f"Failed to retrieve data for username '{username}'. Status code: {response.status_code}")
 
 if __name__ == "__main__":
-    # Get username from command line arguments
-    username ="gantavenkatakousik2021"
-    get_gfg_stats(username)
+    if len(sys.argv) > 1:
+        username = sys.argv[1]
+        get_gfg_stats(username)
+    else:
+        print("Username not provided. Please provide a username as an argument.")
