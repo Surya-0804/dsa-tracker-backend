@@ -191,16 +191,18 @@ export const leetCodeStats = async (req, res) => {
 export const gfgStats = async (req, res) => {
     try {
         const { userName } = req.body;
-
-        exec(`python ../scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
+        exec(`python ./scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
             if (error) {
-                console.error(`exec error: ${error}`);
+                console.error(`exec error: ${error.message}`);
                 return res.status(500).json({ success: false, error: 'Error executing Python script' });
             }
 
-            const filename = `../scraping/${userName}_data.json`;
+            if (stderr) {
+                console.error(`stderr: ${stderr}`);
+                return res.status(500).json({ success: false, error: 'Error executing Python script' });
+            }
 
-            fs.readFile(filename, 'utf8', (err, data) => {
+            fs.readFile('GFG_stats.json', 'utf8', (err, data) => {
                 if (err) {
                     console.error('Error reading JSON file:', err);
                     return res.status(500).json({ success: false, error: 'Error reading JSON file' });
@@ -208,14 +210,16 @@ export const gfgStats = async (req, res) => {
 
                 try {
                     const jsonData = JSON.parse(data);
+                    // Send the JSON data as the response
                     console.log(jsonData);
-                    res.json({ success: true, data: jsonData });
+                    res.json(jsonData);
                 } catch (parseError) {
                     console.error('Error parsing JSON:', parseError);
                     res.status(500).json({ success: false, error: 'Error parsing JSON' });
                 }
             });
         });
+
     } catch (error) {
         console.error(`Internal server error: ${error.message}`);
         return res.status(500).json({ message: "Internal server error", error: error.message });
