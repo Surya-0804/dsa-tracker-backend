@@ -12,8 +12,6 @@ export const loginController = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ error: "Fields must not be empty" });
         }
-        console.log(email)
-        console.log(password)
 
         let user;
         let isMatch;
@@ -28,7 +26,6 @@ export const loginController = async (req, res) => {
             }
         } else {
             user = await User.findOne({ email: email, isGoogleUser: false });
-            console.log(user);
             if (user) {
                 isMatch = await bcrypt.compare(password, user.password);
             }
