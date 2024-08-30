@@ -1,7 +1,6 @@
 import problemsProgress from "../models/problemsProgress.js";
 import userScores from '../models/userScores.js'
 import dsaTracker from "../models/problemSchema.js";
-
 export const completeUserStats = async (req, res) => {
     try {
         const { userId } = req.body;
