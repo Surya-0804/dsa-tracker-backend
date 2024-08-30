@@ -192,9 +192,9 @@ export const gfgStats = async (req, res) => {
     try {
         const { userName } = req.body;
 
-        exec(`pythons ../scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
+        exec(`python3 ../scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
             if (error) {
-                console.error(`exec error: ${error}`);
+                console.error(`exec error: ${userName}`);
                 return res.status(500).json({ success: false, error: 'Error executing Python script' });
             }
 
