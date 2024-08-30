@@ -192,29 +192,29 @@ export const gfgStats = async (req, res) => {
     try {
         const { userName } = req.body;
 
-        exec(`python3 ../scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
+        exec(`python ../scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
             if (error) {
-                console.error(`exec error: ${userName}`);
+                console.error(`exec error: ${error}`);
                 return res.status(500).json({ success: false, error: 'Error executing Python script' });
             }
 
-            const filename = `${userName}_data.json`;
+            const filename = `../scraping/${userName}_data.json`;
 
-            try {
-                fs.readFile(filename, 'utf8', (err, data) => {
-                    if (err) {
-                        console.error('Error reading JSON file:', err);
-                        return res.status(500).json({ success: false, error: 'Error reading JSON file' });
-                    }
+            fs.readFile(filename, 'utf8', (err, data) => {
+                if (err) {
+                    console.error('Error reading JSON file:', err);
+                    return res.status(500).json({ success: false, error: 'Error reading JSON file' });
+                }
 
+                try {
                     const jsonData = JSON.parse(data);
                     console.log(jsonData);
                     res.json({ success: true, data: jsonData });
-                });
-            } catch (parseError) {
-                console.error('Error parsing JSON:', parseError);
-                res.status(500).json({ success: false, error: 'Error parsing JSON' });
-            }
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    res.status(500).json({ success: false, error: 'Error parsing JSON' });
+                }
+            });
         });
     } catch (error) {
         console.error(`Internal server error: ${error.message}`);
