@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import sys
-import { exec } from 'child_process';
 
 def get_gfg_stats(username):
     url = f"https://www.geeksforgeeks.org/user/{username}/"
