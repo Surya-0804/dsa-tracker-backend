@@ -14,28 +14,29 @@ export const loginController = async (req, res) => {
         }
 
         let user;
+        let isMatch;
         if (isGoogleUser) {
-            user = await User.findOne({ googleUid: password, isGoogleUser: true });
+            user = await User.findOne({ email: email, isGoogleUser: true });
+            console.log(user);
+            isMatch = await bcrypt.compare(password, user.password);
         } else {
             user = await User.findOne({ email: email, isGoogleUser: false });
+            isMatch = await bcrypt.compare(password, user.password);
         }
 
         if (!user) {
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({ error: "user doesn;t exist" });
         }
-
-        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({ error: "password didn;t matched" });
         }
 
-        const token = jwt.sign({ _id: user._id, role: "user" }, process.env.JWT_SECRET, { expiresIn: '5h' });
+        const token = jwt.sign({ _id: user._id, role: "user" }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         const now = new Date();
         const year = now.getFullYear();
-        const month = now.getMonth() + 1; // Months are zero-based
+        const month = now.getMonth() + 1;
 
-        // Find or create the user's login record
         let userStreakRecord = await userStreak.findOne({ userId: user._id });
 
         if (!userStreakRecord) {
@@ -91,7 +92,7 @@ export const loginController = async (req, res) => {
     }
 };
 
-// Register Controller
+
 export const registerController = async (req, res) => {
     const { name, email, password, phoneNo, isGoogleUser, photoUrl } = req.body;
     let error = {};
@@ -109,17 +110,13 @@ export const registerController = async (req, res) => {
             return res.status(400).json({ error });
         }
 
-        if (name.length < 3 || name.length > 25) {
-            error = { ...error, name: "Name must be 3-25 characters" };
-            return res.status(400).json({ error });
-        }
 
         if (!validateEmail(email)) {
             error = { ...error, email: "Email is not valid" };
             return res.status(400).json({ error });
         }
 
-        if (password.length < 8) {
+        if (password.length < 5) {
             error = { ...error, password: "Password must be 8-255 characters" };
             return res.status(400).json({ error });
         }
@@ -158,7 +155,6 @@ export const registerController = async (req, res) => {
             profilePic: photoUrl || '',
             score: 0
         });
-        userScores.push({})
         return res.json({ success: "Account created successfully. Please login" });
 
     } catch (err) {

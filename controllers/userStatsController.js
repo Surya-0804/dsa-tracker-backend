@@ -187,32 +187,53 @@ export const leetCodeStats = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
-
 export const gfgStats = async (req, res) => {
     try {
         const { userName } = req.body;
-        const scriptPath = `./scraping/gfg.py ${userName}`;
+        console.log("Received username:", userName);
 
-        // Run the Python script and wait for it to finish
-        const { stdout, stderr } = await exec(`python ${scriptPath}`);
-
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return res.status(500).json({ success: false, error: 'Error executing Python script' });
+        if (!userName) {
+            return res.status(400).json({ success: false, error: 'Username is required' });
         }
 
-        // Read the JSON file and wait for it to be read
-        const data = await fs.readFile('GFG_stats.json', 'utf8');
+        const scriptPath = `./scraping/gfg.py`;
+        console.log("Running script with args:", userName);
 
-        try {
-            const jsonData = JSON.parse(data);
-            // Send the JSON data as the response
-            console.log(jsonData);
-            res.json(jsonData);
-        } catch (parseError) {
-            console.error('Error parsing JSON:', parseError);
-            res.status(500).json({ success: false, error: 'Error parsing JSON' });
-        }
+        const pythonProcess = spawn('python', [scriptPath, userName]);
+
+        let stdout = '';
+        let stderr = '';
+
+        pythonProcess.stdout.on('data', (data) => {
+            stdout += data.toString();
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+            stderr += data.toString();
+        });
+
+        pythonProcess.on('close', async (code) => {
+            if (code !== 0) {
+                console.error(`Python script exited with code ${code}`);
+                console.error(`stderr: ${stderr}`);
+                return res.status(500).json({ success: false, error: `Error executing Python script: ${stderr}` });
+            }
+
+            console.log("Python script output:", stdout);
+
+            try {
+                const data = await fs.readFile('GFG_stats.json', 'utf8');
+                console.log("Read data from JSON file:", data);
+
+                const jsonData = JSON.parse(data);
+                console.log("Parsed JSON data:", jsonData);
+                res.json(jsonData);
+            } catch (parseError) {
+                console.error('Error reading or parsing JSON file:', parseError);
+                res.status(500).json({ success: false, error: 'Error reading or parsing JSON file' });
+            }
+        });
+
     } catch (error) {
         console.error(`Internal server error: ${error.message}`);
         res.status(500).json({ success: false, error: 'Internal server error' });
