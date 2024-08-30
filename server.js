@@ -12,6 +12,9 @@ import corsHandler from "./allowCors.js";
 import problemsProgressRoute from './routes/problemsProgressRoute.js'
 import userStatsRoute from './routes/userStatsRoute.js'
 import scrapedCodingStatsRoute from './routes/scrapedCodingStatsRoute.js'
+import userDetailsRoute from './routes/userDetailsRoute.js'
+
+
 const app = express();
 
 dotenv.config();
@@ -40,6 +43,7 @@ app.use("/auth", authRoute);
 app.use("/problemProgress", problemsProgressRoute);
 app.use("/stats", userStatsRoute)
 app.use("/codingStats", scrapedCodingStatsRoute)
+app.use("/userDetails", userDetailsRoute)
 const PORT = process.env.PORT
 
 app.get("/", (req, res) => {
