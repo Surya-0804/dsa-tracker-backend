@@ -191,37 +191,30 @@ export const leetCodeStats = async (req, res) => {
 export const gfgStats = async (req, res) => {
     try {
         const { userName } = req.body;
-        exec(`python ./scraping/gfg.py ${userName}`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`exec error: ${error.message}`);
-                return res.status(500).json({ success: false, error: 'Error executing Python script' });
-            }
+        const scriptPath = `./scraping/gfg.py ${userName}`;
 
-            if (stderr) {
-                console.error(`stderr: ${stderr}`);
-                return res.status(500).json({ success: false, error: 'Error executing Python script' });
-            }
+        // Run the Python script and wait for it to finish
+        const { stdout, stderr } = await exec(`python ${scriptPath}`);
 
-            fs.readFile('GFG_stats.json', 'utf8', (err, data) => {
-                if (err) {
-                    console.error('Error reading JSON file:', err);
-                    return res.status(500).json({ success: false, error: 'Error reading JSON file' });
-                }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return res.status(500).json({ success: false, error: 'Error executing Python script' });
+        }
 
-                try {
-                    const jsonData = JSON.parse(data);
-                    // Send the JSON data as the response
-                    console.log(jsonData);
-                    res.json(jsonData);
-                } catch (parseError) {
-                    console.error('Error parsing JSON:', parseError);
-                    res.status(500).json({ success: false, error: 'Error parsing JSON' });
-                }
-            });
-        });
+        // Read the JSON file and wait for it to be read
+        const data = await fs.readFile('GFG_stats.json', 'utf8');
 
+        try {
+            const jsonData = JSON.parse(data);
+            // Send the JSON data as the response
+            console.log(jsonData);
+            res.json(jsonData);
+        } catch (parseError) {
+            console.error('Error parsing JSON:', parseError);
+            res.status(500).json({ success: false, error: 'Error parsing JSON' });
+        }
     } catch (error) {
         console.error(`Internal server error: ${error.message}`);
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
