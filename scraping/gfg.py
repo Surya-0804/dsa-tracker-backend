@@ -56,18 +56,18 @@ def get_gfg_stats(username):
             'Difficulty Data': difficulty_data
         }
 
-        filename = f"{username}_data.json"
-        with open(filename, 'w') as json_file:
-            json.dump(result, json_file, indent=4)
-
-        print(f"Data saved to {filename}")
+        # Return the result as JSON
+        return json.dumps(result, indent=4)
 
     else:
-        print(f"Failed to retrieve data for username '{username}'. Status code: {response.status_code}")
+        error_message = f"Failed to retrieve data for username '{username}'. Status code: {response.status_code}"
+        return json.dumps({'error': error_message}, indent=4)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         username = sys.argv[1]
-        get_gfg_stats(username)
+        json_data = get_gfg_stats(username)
+        print(json_data)
     else:
         print("Username not provided. Please provide a username as an argument.")
